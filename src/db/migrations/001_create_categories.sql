@@ -25,3 +25,13 @@ CREATE TRIGGER update_categories_updated_at
     BEFORE UPDATE ON categories
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column(); 
+
+create role web_anon nologin;
+grant usage on schema api to web_anon;
+grant select on api.categories to web_anon;
+
+create role authenticator noinherit login password 'mysecretpassword';
+grant web_anon to authenticator;
+
+GRANT ALL PRIVILEGES ON TABLE api.categories TO web_anon;
+GRANT ALL PRIVILEGES ON ALL sequences IN SCHEMA api TO web_anon;

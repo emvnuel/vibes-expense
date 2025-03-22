@@ -43,6 +43,7 @@ export function Header() {
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+            className="cursor-pointer"
           >
             {theme === "light" ? (
               <Moon className="h-5 w-5" />

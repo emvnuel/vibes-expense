@@ -170,7 +170,7 @@ export default function CategoriesPage() {
         <h1 className="text-3xl font-bold">Categorias</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="cursor-pointer">
               <Plus className="mr-2 h-4 w-4" />
               Adicionar Categoria
             </Button>
@@ -213,7 +213,7 @@ export default function CategoriesPage() {
                 </div>
               </div>
               <Button 
-                className="w-full"
+                className="w-full cursor-pointer"
                 onClick={handleCreateCategory}
                 disabled={!newCategory.name || !newCategory.budget}
               >
@@ -233,6 +233,7 @@ export default function CategoriesPage() {
               </CardTitle>
               <div className="flex gap-2">
                 <Button 
+                  className="cursor-pointer"
                   variant="ghost" 
                   size="icon"
                   onClick={() => {
@@ -243,6 +244,7 @@ export default function CategoriesPage() {
                   <Pencil className="h-4 w-4" />
                 </Button>
                 <Button 
+                  className="cursor-pointer"
                   variant="ghost" 
                   size="icon"
                   onClick={() => {
@@ -352,12 +354,14 @@ export default function CategoriesPage() {
             </div>
             <div className="flex justify-end gap-2">
               <Button
+                className="cursor-pointer"
                 variant="outline"
                 onClick={() => setIsEditDialogOpen(false)}
               >
                 Cancelar
               </Button>
               <Button
+                className="cursor-pointer"
                 onClick={handleEditCategory}
                 disabled={!categoryToEdit?.name || !categoryToEdit?.budget}
               >

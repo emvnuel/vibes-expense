@@ -30,3 +30,6 @@ CREATE TRIGGER update_expenses_updated_at
     EXECUTE FUNCTION api.update_updated_at_column();
 
 grant select on api.expenses to web_anon;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA api TO web_anon;
+GRANT ALL PRIVILEGES ON ALL sequences IN SCHEMA api TO web_anon;

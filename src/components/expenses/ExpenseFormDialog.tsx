@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Plus } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,58 +39,159 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ptBR } from "date-fns/locale";
+import { MoneyInput } from "@/components/ui/money-input";
+import { useToast } from "@/components/ui/use-toast";
+
+interface Category {
+  id: number;
+  name: string;
+  color: string;
+  budget: number;
+  spent: number;
+}
 
 const formSchema = z.object({
-  amount: z.string().min(1, "Valor é obrigatório"),
+  amount: z.number().min(0.01, "Valor deve ser maior que zero"),
   date: z.date({
     required_error: "Data é obrigatória",
   }),
-  category: z.string().min(1, "Categoria é obrigatória"),
+  category_id: z.string().min(1, "Categoria é obrigatória"),
   description: z.string().min(1, "Descrição é obrigatória"),
   tags: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
-const categories = [
-  "Alimentação",
-  "Transporte",
-  "Entretenimento",
-  "Compras",
-  "Saúde",
-  "Educação",
-  "Moradia",
-  "Outros",
-];
+interface ExpenseRequestBody {
+  date: string;
+  description: string;
+  category_id: number;
+  amount: number;
+}
 
-export function ExpenseFormDialog() {
-  const [open, setOpen] = useState(false);
+interface ExpenseFormDialogProps {
+  categories: Category[];
+  onExpenseAdded?: () => void;
+  expense?: {
+    id: number;
+    date: string;
+    description: string;
+    category_id: number;
+    amount: number;
+    tags?: string;
+  };
+  triggerButton?: React.ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function ExpenseFormDialog({ 
+  categories, 
+  onExpenseAdded, 
+  expense, 
+  triggerButton,
+  open,
+  onOpenChange
+}: ExpenseFormDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  const isEditing = !!expense;
+  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: "",
+      amount: 0,
       description: "",
       tags: "",
     },
   });
 
-  function onSubmit(values: FormValues) {
-    console.log(values);
-    setOpen(false);
-    form.reset();
+  // Reset form when dialog opens and populate with expense data if editing
+  useEffect(() => {
+    const isOpen = open !== undefined ? open : internalOpen;
+    
+    if (isOpen) {
+      if (expense) {
+        form.reset({
+          amount: expense.amount,
+          description: expense.description,
+          tags: expense.tags || "",
+          date: new Date(expense.date),
+          category_id: String(expense.category_id),
+        });
+      } else {
+        form.reset({
+          amount: 0,
+          description: "",
+          tags: "",
+        });
+      }
+    }
+  }, [form, expense, open, internalOpen]);
+
+  async function onSubmit(values: FormValues) {
+    try {
+      setIsSubmitting(true);
+
+      const expenseData: ExpenseRequestBody = {
+        date: format(values.date, "yyyy-MM-dd"),
+        description: values.description,
+        category_id: parseInt(values.category_id),
+        amount: values.amount,
+      };
+
+      const url = isEditing 
+        ? `http://localhost:8080/expenses?id=eq.${expense.id}` 
+        : "http://localhost:8080/expenses";
+      
+      const method = isEditing ? "PATCH" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(expenseData),
+      });
+
+      if (!response.ok) {
+        throw new Error(isEditing ? "Erro ao atualizar despesa" : "Erro ao salvar despesa");
+      }
+
+      toast({
+        title: "Sucesso!",
+        description: isEditing 
+          ? "Despesa atualizada com sucesso." 
+          : "Despesa adicionada com sucesso.",
+      });
+
+      setInternalOpen(false);
+      form.reset();
+      onExpenseAdded?.();
+    } catch (error) {
+      console.error(isEditing ? "Error updating expense:" : "Error saving expense:", error);
+      toast({
+        title: "Erro",
+        description: isEditing 
+          ? "Não foi possível atualizar a despesa. Tente novamente." 
+          : "Não foi possível salvar a despesa. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
+  const isOpen = open !== undefined ? open : internalOpen;
+  const setIsOpen = onOpenChange || setInternalOpen;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Nova Despesa
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {triggerButton && <DialogTrigger asChild>{triggerButton}</DialogTrigger>}
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Adicionar Nova Despesa</DialogTitle>
+          <DialogTitle>{isEditing ? "Editar Despesa" : "Adicionar Nova Despesa"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -101,11 +202,10 @@ export function ExpenseFormDialog() {
                 <FormItem>
                   <FormLabel>Valor</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="0,00"
-                      {...field}
+                    <MoneyInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="R$ 0,00"
                     />
                   </FormControl>
                   <FormMessage />
@@ -156,7 +256,7 @@ export function ExpenseFormDialog() {
             />
             <FormField
               control={form.control}
-              name="category"
+              name="category_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categoria</FormLabel>
@@ -171,8 +271,8 @@ export function ExpenseFormDialog() {
                     </FormControl>
                     <SelectContent>
                       {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
+                        <SelectItem key={category.id} value={category.id.toString()}>
+                          {category.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -213,8 +313,8 @@ export function ExpenseFormDialog() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Salvar Despesa
+            <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
+              {isSubmitting ? "Salvando..." : (isEditing ? "Atualizar Despesa" : "Salvar Despesa")}
             </Button>
           </form>
         </Form>

@@ -65,21 +65,6 @@ export default function CategoriesPage() {
     fetchCategories();
   }, []);
 
-  const formatInputValue = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
-
-  const parseInputValue = (value: string) => {
-    // Remove all non-numeric characters except decimal point
-    const numericValue = value.replace(/[^\d,]/g, '').replace(',', '.');
-    return parseFloat(numericValue) || 0;
-  };
-
   const handleCreateCategory = async () => {
     try {
       const response = await fetch('http://localhost:8080/categories', {

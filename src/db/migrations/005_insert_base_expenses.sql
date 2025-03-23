@@ -22,7 +22,7 @@ INSERT INTO api.expenses (date, description, category_id, amount) VALUES
     ('2025-03-03', 'Conta de Celular', (SELECT id FROM api.categories WHERE name = 'Contas'), 69.90),
     ('2025-03-02', 'Jantar Especial', (SELECT id FROM api.categories WHERE name = 'Alimentação'), 95.40),
     ('2025-03-01', 'Assinatura Spotify', (SELECT id FROM api.categories WHERE name = 'Entretenimento'), 19.90),
-    ('2025-02-29', 'Manutenção da Bicicleta', (SELECT id FROM api.categories WHERE name = 'Transporte'), 45.00),
+    ('2025-02-28', 'Manutenção da Bicicleta', (SELECT id FROM api.categories WHERE name = 'Transporte'), 45.00),
     ('2025-02-28', 'Roupas de Academia', (SELECT id FROM api.categories WHERE name = 'Compras'), 129.90),
     ('2025-02-27', 'Seguro Residencial', (SELECT id FROM api.categories WHERE name = 'Contas'), 120.00),
     ('2025-02-26', 'Delivery de Comida', (SELECT id FROM api.categories WHERE name = 'Alimentação'), 42.90),

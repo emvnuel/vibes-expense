@@ -28,7 +28,7 @@ import { formatCurrency } from "@/lib/utils";
 // Definir interfaces para os dados dos relatórios
 interface MonthlyTrend {
   name: string;
-  amount: number;
+  valor: number;
 }
 
 interface CategoryData {
@@ -86,7 +86,7 @@ export default function ReportsPage() {
         // Atualizar estado com dados obtidos
         setMonthlyData(monthlyTrendData.map((item) => ({
           name: item.month_name,
-          amount: item.total_amount
+          valor: item.total_amount
         })));
         
         setCategoryData(categoryDistributionData.map((item) => ({
@@ -228,7 +228,7 @@ export default function ReportsPage() {
                       />
                       <Line
                         type="monotone"
-                        dataKey="amount"
+                        dataKey="valor"
                         stroke="#8884d8"
                         strokeWidth={2}
                       />

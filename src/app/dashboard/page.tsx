@@ -185,7 +185,7 @@ export default function DashboardPage() {
                 <LineChart 
                   data={monthlyTrend.map(item => ({
                     name: item.month_name,
-                    amount: item.total_amount
+                    valor: item.total_amount
                   }))}
                   margin={{ left: 50, right: 20, top: 10, bottom: 10 }}
                 >
@@ -202,7 +202,7 @@ export default function DashboardPage() {
                   />
                   <Line
                     type="monotone"
-                    dataKey="amount"
+                    dataKey="valor"
                     stroke="#8884d8"
                     strokeWidth={2}
                   />

@@ -259,11 +259,16 @@ export default function CategoriesPage() {
                   <div
                     className="h-2 rounded-full"
                     style={{
-                      backgroundColor: category.color,
-                      width: `${(category.spent / category.budget) * 100}%`,
+                      backgroundColor: category.spent > category.budget ? "rgb(239, 68, 68)" : category.color,
+                      width: `${Math.min((category.spent / category.budget) * 100, 100)}%`,
                     }}
                   />
                 </div>
+                {category.spent > category.budget && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Excedeu o orçamento em {formatCurrency(category.spent - category.budget)}
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

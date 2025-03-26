@@ -380,11 +380,10 @@ export default function ExpensesPage() {
                       const category = getCategory(expense.category_id);
                       return (
                         <Badge 
-                          variant="secondary" 
+                          variant="outline" 
                           style={{ 
-                            backgroundColor: category.color,
-                            color: '#FFFFFF',
-                            borderColor: 'transparent'
+                            borderColor: category.color,
+                            color: category.color,
                           }}
                         >
                           {category.name}

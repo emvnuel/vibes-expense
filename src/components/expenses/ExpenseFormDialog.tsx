@@ -23,7 +23,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -57,7 +56,6 @@ const formSchema = z.object({
   }),
   category_id: z.string().min(1, "Categoria é obrigatória"),
   description: z.string().min(1, "Descrição é obrigatória"),
-  tags: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -103,7 +101,6 @@ export function ExpenseFormDialog({
     defaultValues: {
       amount: 0,
       description: "",
-      tags: "",
     },
   });
 
@@ -116,7 +113,6 @@ export function ExpenseFormDialog({
         form.reset({
           amount: expense.amount,
           description: expense.description,
-          tags: expense.tags || "",
           date: new Date(expense.date),
           category_id: String(expense.category_id),
         });
@@ -124,7 +120,6 @@ export function ExpenseFormDialog({
         form.reset({
           amount: 0,
           description: "",
-          tags: "",
         });
       }
     }
@@ -290,22 +285,6 @@ export function ExpenseFormDialog({
                   <FormControl>
                     <Textarea
                       placeholder="Descreva sua despesa..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="tags"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tags (opcional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Ex: mercado, lazer, urgente..."
                       {...field}
                     />
                   </FormControl>

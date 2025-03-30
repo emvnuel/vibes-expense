@@ -223,10 +223,12 @@ export default function DashboardPage() {
                 <ResponsiveContainer width="100%" height="80%">
                   <PieChart>
                     <Pie
-                      data={categoryDistribution.map(item => ({
-                        name: item.category_name,
-                        value: item.total_amount
-                      }))}
+                      data={categoryDistribution
+                        .filter(item => item.total_amount > 0)
+                        .map(item => ({
+                          name: item.category_name,
+                          value: item.total_amount
+                        }))}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -235,12 +237,14 @@ export default function DashboardPage() {
                       dataKey="value"
                       label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
-                      {categoryDistribution.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.category_color}
-                        />
-                      ))}
+                      {categoryDistribution
+                        .filter(item => item.total_amount > 0)
+                        .map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={entry.category_color}
+                          />
+                        ))}
                     </Pie>
                     <Tooltip formatter={(value) => formatCurrency(Number(value))} />
                   </PieChart>

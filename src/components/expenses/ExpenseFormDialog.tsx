@@ -110,10 +110,14 @@ export function ExpenseFormDialog({
     
     if (isOpen) {
       if (expense) {
+        // Adjust the date to account for timezone
+        const expenseDate = new Date(expense.date);
+        const adjustedDate = new Date(expenseDate.getTime() + expenseDate.getTimezoneOffset() * 60000);
+        
         form.reset({
           amount: expense.amount,
           description: expense.description,
-          date: new Date(expense.date),
+          date: adjustedDate,
           category_id: String(expense.category_id),
         });
       } else {
